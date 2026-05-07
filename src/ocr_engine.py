@@ -5,13 +5,29 @@ import pytesseract
 from PIL import Image
 
 
+pytesseract.pytesseract.tesseract_cmd = (
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+)
+
+
 class OCREngine:
     def __init__(self):
         pass
 
     def preprocess_image(self, image):
+        if not isinstance(image, Image.Image):
+            image = Image.open(image)
+
         image = np.array(image)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        if len(image.shape) == 3:
+            gray = cv2.cvtColor(
+                image,
+                cv2.COLOR_BGR2GRAY
+            )
+
+        else:
+            gray = image
 
         threshold = cv2.threshold(
             gray,
