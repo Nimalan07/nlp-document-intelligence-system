@@ -22,12 +22,12 @@ class NERTrainer:
             for start, end, label in annotations["entities"]:
                 self.ner.add_label(label)
 
-    def train_model(self, iterations=20):
+    def train_model(self, iterations=50):
         self.add_labels()
 
         optimizer = self.nlp.begin_training()
 
-        for _ in range(iterations):
+        for iteration in range(iterations):
             random.shuffle(training_data)
 
             losses = {}
@@ -46,6 +46,11 @@ class NERTrainer:
                     losses=losses,
                     sgd=optimizer
                 )
+
+            print(
+                f"Iteration {iteration + 1} Losses:",
+                losses
+            )
 
         self.nlp.to_disk(
             "models/spacy_ner_model"

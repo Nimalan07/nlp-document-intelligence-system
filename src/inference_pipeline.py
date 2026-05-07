@@ -1,42 +1,54 @@
-from src.data_ingestion import DataIngestion
-from src.entity_extraction import EntityExtractor
+from PIL import Image
+
 from src.ocr_engine import OCREngine
-from src.post_processing import PostProcessor
 from src.preprocess import TextPreprocessor
+from src.entity_extraction import EntityExtractor
+from src.post_processing import PostProcessor
 
-
+from src.key_value_extraction import (
+    KeyValueExtractor
+)
 class InferencePipeline:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, document_path):
+        self.document_path = document_path
 
-        self.data_ingestion = DataIngestion(file_path)
         self.ocr_engine = OCREngine()
+
         self.preprocessor = TextPreprocessor()
+
         self.entity_extractor = EntityExtractor()
+
         self.post_processor = PostProcessor()
 
+        self.key_value_extractor = KeyValueExtractor()
+
     def run_pipeline(self):
-        document = self.data_ingestion.load_document()
-
-        if isinstance(document, list):
-            text = ""
-
-            for page in document:
-                extracted_text = self.ocr_engine.extract_text(page)
-                text += extracted_text + " "
-
-        elif isinstance(document, str):
-            text = document
-
-        else:
-            text = self.ocr_engine.extract_text(document)
-
-        cleaned_text = self.preprocessor.clean_text(text)
-
-        entities = self.entity_extractor.extract_entities(cleaned_text)
-
-        processed_entities = self.post_processor.process_entities(
-            entities
+        document = Image.open(
+            self.document_path
         )
 
-        return processed_entities
+        text = self.ocr_engine.extract_text(
+            document
+        )
+
+        cleaned_text = (
+            self.preprocessor.clean_text(
+                text
+            )
+        )
+
+        entities = (
+            self.entity_extractor.extract_entities(
+                cleaned_text
+            )
+        )
+
+        cleaned_entities = (
+            self.post_processor.clean_entities(
+                entities
+            )
+        )
+
+        structured_output = ( self.key_value_extractor.extract_pairs(cleaned_entities)
+)
+        return structured_output

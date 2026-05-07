@@ -1,37 +1,35 @@
-import re
-
-
 class PostProcessor:
     def __init__(self):
         pass
 
-    def validate_date(self, value):
-        pattern = r"\b\d{2}[/-]\d{2}[/-]\d{4}\b"
+    def clean_entities(self, entities):
+        cleaned_entities = {}
 
-        if re.match(pattern, value):
-            return value
+        for label, values in entities.items():
+            cleaned_values = []
 
-        return None
+            for value in values:
+                text = value["text"].strip()
 
-    def validate_currency(self, value):
-        pattern = r"[\$₹€]\s?\d+(?:,\d{3})*(?:\.\d{2})?"
+                if len(text) < 3:
+                    continue
 
-        if re.match(pattern, value):
-            return value
+                if len(text) > 200:
+                    continue
 
-        return None
+                entity = {
+                    "text": text,
+                    "start": value["start"],
+                    "end": value["end"]
+                }
 
-    def process_entities(self, entities):
-        processed_entities = {}
+                if entity not in cleaned_values:
+                    cleaned_values.append(
+                        entity
+                    )
 
-        for key, value in entities.items():
-            if "date" in key.lower():
-                processed_entities[key] = self.validate_date(value)
+            cleaned_entities[label] = (
+                cleaned_values
+            )
 
-            elif "amount" in key.lower():
-                processed_entities[key] = self.validate_currency(value)
-
-            else:
-                processed_entities[key] = value
-
-        return processed_entities
+        return cleaned_entities

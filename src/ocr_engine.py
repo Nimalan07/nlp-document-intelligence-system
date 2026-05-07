@@ -29,17 +29,33 @@ class OCREngine:
         else:
             gray = image
 
-        threshold = cv2.threshold(
+        resized = cv2.resize(
             gray,
-            0,
+            None,
+            fx=2,
+            fy=2,
+            interpolation=cv2.INTER_CUBIC
+        )
+
+        denoised = cv2.fastNlMeansDenoising(
+            resized
+        )
+
+        threshold = cv2.adaptiveThreshold(
+            denoised,
             255,
-            cv2.THRESH_BINARY + cv2.THRESH_OTSU
-        )[1]
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            11,
+            2
+        )
 
         return threshold
 
     def extract_text(self, image):
-        processed_image = self.preprocess_image(image)
+        processed_image = self.preprocess_image(
+            image
+        )
 
         text = pytesseract.image_to_string(
             processed_image,
