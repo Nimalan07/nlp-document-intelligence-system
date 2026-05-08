@@ -4,21 +4,18 @@ __pycache__/
 *.pyd
 
 .env
-
-.venv/
 venv/
+.venv/
+
+.DS_Store
+Thumbs.db
+models/spacy_ner_model/
+
+data/raw/
+
+sample_outputs/output.json
 
 .idea/
 .vscode/
 
-models/checkpoints/
-models/spacy_ner_model/
-
-data/processed/
-data/outputs/
-
 *.log
-*.sqlite3
-
-.DS_Store
-Thumbs.db

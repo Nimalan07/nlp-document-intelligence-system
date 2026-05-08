@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: nlp-document-intelligence-system
+    env: docker
+    plan: free
